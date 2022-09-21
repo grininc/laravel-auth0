@@ -35,8 +35,8 @@
     "ext-filter": "*",
     "ext-mbstring": "*",
     "auth0/auth0-php": "^7.9",
-    "illuminate/support": " ^6.0 || ^7.0 || ^8.0",
-    "illuminate/contracts": "^6.0 || ^7.0 || ^8.0"
+    "illuminate/support": " ^6.0 || ^7.0 || ^8.0 || ^9.0",
+    "illuminate/contracts": "^6.0 || ^7.0 || ^8.0 || ^9.0"
   },
   "require-dev": {
     "nunomaduro/phpinsights": "^1.13 || ^2.0",
