@@ -1,5 +1,5 @@
 {
-    "name": "auth0/login",
+    "name": "grininc/laravel-auth0",
     "description": "Auth0 Laravel SDK. Straight-forward and tested methods for implementing authentication, and accessing Auth0's Management API endpoints.",
     "license": "MIT",
     "type": "library",
@@ -35,12 +35,12 @@
         "source": "https://github.com/auth0/laravel-auth0"
     },
     "require": {
-        "php": "^8.2",
+        "php": ">=8.1",
         "ext-json": "*",
         "auth0/auth0-php": "^8.10",
-        "illuminate/contracts": "^11",
-        "illuminate/http": "^11",
-        "illuminate/support": "^11",
+        "illuminate/contracts": "^10|^11",
+        "illuminate/http": "^10|^11",
+        "illuminate/support": "^10|^11",
         "psr-discovery/all": "^1",
         "psr/cache": "^2 || ^3"
     },
@@ -49,7 +49,7 @@
         "friendsofphp/php-cs-fixer": "^3",
         "larastan/larastan": "^2",
         "mockery/mockery": "^1",
-        "orchestra/testbench": "^9",
+        "orchestra/testbench": "^8|^9",
         "pestphp/pest": "^2",
         "pestphp/pest-plugin-laravel": "^2",
         "phpstan/phpstan": "^1",
