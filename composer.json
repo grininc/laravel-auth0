@@ -62,7 +62,6 @@
         "vimeo/psalm": "^5",
         "wikimedia/composer-merge-plugin": "^2"
     },
-    "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
