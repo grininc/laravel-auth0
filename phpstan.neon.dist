@@ -1,20 +1,19 @@
 includes:
-    - vendor/phpstan/phpstan-strict-rules/rules.neon
-    - vendor/nunomaduro/larastan/extension.neon
+    - ./vendor/phpstan/phpstan-strict-rules/rules.neon
+    - ./vendor/larastan/larastan/extension.neon
 
 parameters:
     level: max
 
     paths:
         - src
-
-    bootstrapFiles:
-        - tests/constants.php
+        - deprecated
 
     ignoreErrors:
+        - '#Constructor of class (.*) has an unused parameter (.*).#'
         - '#Method (.*) has parameter (.*) with no value type specified in iterable type array.#'
-        - '#Cannot call method (.*) on mixed#'
         - '#no value type specified in iterable type array.#'
-        - '#Call to an undefined method Illuminate\\(.*).#'
 
     reportUnmatchedIgnoredErrors: false
+    treatPhpDocTypesAsCertain: false
+    checkGenericClassInNonGenericObjectType: false

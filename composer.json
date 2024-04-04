@@ -64,28 +64,30 @@
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
-            "Auth0\\Laravel\\": "src"
+            "Auth0\\Laravel\\": [
+                "src/",
+                "deprecated/"
+            ]
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Auth0\\Laravel\\Tests\\": "tests"
+            "Auth0\\Laravel\\Tests\\": "tests/"
         }
     },
     "config": {
         "allow-plugins": {
+            "ergebnis/composer-normalize": true,
             "pestphp/pest-plugin": true,
-            "wikimedia/composer-merge-plugin": true,
-            "ergebnis/composer-normalize": true
+            "php-http/discovery": false,
+            "wikimedia/composer-merge-plugin": true
         },
         "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "process-timeout": 0,
         "sort-packages": true
     },
     "extra": {
-        "composer-normalize": {
-            "indent-size": 4,
-            "indent-style": "space"
-        },
         "laravel": {
             "aliases": {
                 "Auth0": "Auth0\\Laravel\\Facade\\Auth0"
@@ -108,14 +110,23 @@
         }
     },
     "scripts": {
-        "phpstan": "@php vendor/bin/phpstan analyse",
-        "phpstan:pro": "@php vendor/bin/phpstan analyse --pro",
-        "pint": "@php vendor/bin/pint --test",
-        "pint:fix": "@php vendor/bin/pint",
+        "pest": "@php vendor/bin/pest --order-by random --fail-on-risky --parallel",
+        "pest:coverage": "@php vendor/bin/pest --order-by random --fail-on-risky --coverage --parallel",
+        "pest:debug": "@php vendor/bin/pest --log-events-verbose-text pest.log --display-errors --fail-on-risky",
+        "pest:profile": "@php vendor/bin/pest --profile",
+        "phpcs": "@php vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "phpcs:fix": "@php vendor/bin/php-cs-fixer fix",
+        "phpstan": "@php vendor/bin/phpstan analyze",
         "psalm": "@php vendor/bin/psalm",
         "psalm:fix": "@php vendor/bin/psalter --issues=all",
         "rector": "@php vendor/bin/rector process src --dry-run",
         "rector:fix": "@php vendor/bin/rector process src",
-        "test": "@php vendor/bin/pest --order-by random"
+        "test": [
+            "@pest",
+            "@phpstan",
+            "@psalm",
+            "@rector",
+            "@phpcs"
+        ]
     }
 }

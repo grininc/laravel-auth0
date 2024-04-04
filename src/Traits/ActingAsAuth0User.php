@@ -4,36 +4,71 @@ declare(strict_types=1);
 
 namespace Auth0\Laravel\Traits;
 
-use Auth0\Laravel\Model\Stateless\User;
-use Auth0\Laravel\StateInstance;
-use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Auth0\Laravel\Entities\CredentialEntity;
+use Auth0\Laravel\Guards\GuardContract;
+use Auth0\Laravel\UserProvider;
+use Auth0\Laravel\Users\ImposterUser;
+use Illuminate\Contracts\Auth\Authenticatable;
 
+/**
+ * Set the currently logged in user for the application. Only intended for unit testing.
+ *
+ * @deprecated 7.8.0 Use Auth0\Laravel\Traits\Impersonate instead.
+ *
+ * @api
+ */
 trait ActingAsAuth0User
 {
-    abstract public function actingAs(UserContract $user, $guard = null);
+    public array $defaultActingAsAttributes = [
+        'sub' => 'some-auth0-user-id',
+        'azp' => 'some-auth0-application-client-id',
+        'scope' => '',
+    ];
 
     /**
-     * use this method to impersonate a specific auth0 user
-     * if you pass an attributes array, it will be merged with a set of default values.
+     * Set the currently logged in user for the application. Only intended for unit testing.
      *
-     * @return mixed
+     * @param array<mixed> $attributes The attributes to use for the user.
+     * @param null|string  $guard      The guard to impersonate with.
+     * @param ?int         $source
      */
-    public function actingAsAuth0User(array $attributes = [])
-    {
-        $defaults = [
-            'sub'   => 'some-auth0-user-id',
-            'azp'   => 'some-auth0-appplication-client-id',
-            'iat'   => time(),
-            'exp'   => time() + 60 * 60,
-            'scope' => '',
-        ];
+    public function actingAsAuth0User(
+        array $attributes = [],
+        ?string $guard = null,
+        ?int $source = GuardContract::SOURCE_TOKEN,
+    ): self {
+        $issued = time();
+        $expires = $issued + 60 * 60;
+        $timestamps = ['iat' => $issued, 'exp' => $expires];
+        $attributes = array_merge($this->defaultActingAsAttributes, $timestamps, $attributes);
+        $scope = $attributes['scope'] ? explode(' ', $attributes['scope']) : [];
+        unset($attributes['scope']);
 
-        $auth0user = new User(array_merge($defaults, $attributes));
+        $instance = auth()->guard($guard);
 
-        if ($auth0user->getAttribute('scope')) {
-            app(StateInstance::class)->setAccessTokenScope(explode(' ', $auth0user->getAttribute('scope')));
+        if (! $instance instanceof GuardContract) {
+            $user = new ImposterUser($attributes);
+
+            return $this->actingAs($user, $guard);
         }
 
-        return $this->actingAs($auth0user, 'auth0');
+        $provider = new UserProvider();
+
+        if (GuardContract::SOURCE_SESSION === $source) {
+            $user = $provider->getRepository()->fromSession($attributes);
+        } else {
+            $user = $provider->getRepository()->fromAccessToken($attributes);
+        }
+
+        $credential = CredentialEntity::create(
+            user: $user,
+            accessTokenScope: $scope,
+        );
+
+        $instance->setImpersonating($credential, $source);
+
+        return $this->actingAs($user, $guard);
     }
+
+    abstract public function actingAs(Authenticatable $user, $guard = null);
 }
